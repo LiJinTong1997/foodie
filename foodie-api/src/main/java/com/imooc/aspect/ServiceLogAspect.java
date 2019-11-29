@@ -25,12 +25,15 @@ public class ServiceLogAspect {
      * 切面表达式
      * execution 代表所要执行的表达式主体
      * 第一处 * 代表方法的返回类型 *代表所有
-     * 第二处 包
+     * 第二处 包名  代表AOP监控类所在的包
+     * 第三处 ..  代表该包及其所有子包下的所有类方法
+     * 地四处  *代表类名  *代表所有类
+     * 第五处  *(..) *代表类中的方法名，(..)表示方法中的任何参数
      * @param joinPoint
      * @return
      * @throws Throwable
      */
-    @Around("execution(* com.imooc.service.impl)")
+    @Around("execution(* com.imooc.service.impl..*.*(..))")
     public Object recordTimeLog(ProceedingJoinPoint joinPoint) throws Throwable {
         logger.info("===方法开始执行  {}.{}===",joinPoint.getTarget().getClass(),joinPoint.getSignature().getName());
 
@@ -51,5 +54,6 @@ public class ServiceLogAspect {
             logger.info("=====执行结束，耗时：{} 毫秒====",time);
         }
 
+        return result;
     }
 }

@@ -104,6 +104,30 @@ public class PassportController {
         return JsonResult.ok(result);
     }
 
+    @ApiOperation(value = "用户注销",notes = "用户注销",httpMethod = "POST")
+    @PostMapping("/logout")
+    public JsonResult logout(@RequestParam String userId,HttpServletRequest request, HttpServletResponse response){
+        //清除用户相关信息cookie
+        CookieUtils.deleteCookie(request,response,"user");
+        // TODO  用户退出登录需要清空购物车
+
+        // TODO  分布式会话中，需要清除用户数据
+        return JsonResult.ok();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public Users setNullProperty(Users result){
         result.setPassword(null);
         result.setMobile(null);
@@ -113,4 +137,6 @@ public class PassportController {
 
         return result;
     }
+
+
 }
