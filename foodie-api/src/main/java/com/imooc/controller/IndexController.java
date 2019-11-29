@@ -3,15 +3,19 @@ package com.imooc.controller;
 import com.imooc.enums.YesOrNo;
 import com.imooc.pojo.Carousel;
 import com.imooc.pojo.Category;
+import com.imooc.pojo.vo.CategoryVO;
+import com.imooc.pojo.vo.NewItemsVO;
 import com.imooc.service.CarouselService;
 import com.imooc.service.CategoryService;
 import com.imooc.utils.JsonResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
@@ -42,12 +46,36 @@ public class IndexController {
      * 1.第一次刷新首页查询大分类，渲染到展示页面
      * 2.如果鼠标移动到大分类，则加载其子分类，如果已经存在子分类，则不需要加载 -》懒加载
      */
-
     @ApiOperation(value = "获取商品一级分类",notes = "获取商品一级分类",httpMethod = "GET")
     @GetMapping("/cats")
     public JsonResult cats(){
         List<Category> list = categoryService.queryAllRootLevelCat();
 
+        return JsonResult.ok(list);
+    }
+
+    @ApiOperation(value = "获取商品子分类",notes = "获取商品子分类",httpMethod = "GET")
+    @GetMapping("/subCat/{rootCatId}")
+    public JsonResult subCat(@ApiParam(name="rootCatId",value = "一级分类id",required = true) @PathVariable Integer rootCatId){
+        if(rootCatId == null){
+            return JsonResult.errorMsg("分类不存在");
+        }
+
+        List<CategoryVO> list = categoryService.getSubCatList(rootCatId);
+        return JsonResult.ok(list);
+    }
+
+    @ApiOperation(value = "查询每个一级分类下的最新6条商品数据", notes = "查询每个一级分类下的最新6条商品数据", httpMethod = "GET")
+    @GetMapping("/sixNewItems/{rootCatId}")
+    public JsonResult sixNewItems(
+            @ApiParam(name = "rootCatId", value = "一级分类id", required = true)
+            @PathVariable Integer rootCatId) {
+
+        if (rootCatId == null) {
+            return JsonResult.errorMsg("分类不存在");
+        }
+
+        List<NewItemsVO> list = categoryService.getSixNewItemsLazy(rootCatId);
         return JsonResult.ok(list);
     }
 }
